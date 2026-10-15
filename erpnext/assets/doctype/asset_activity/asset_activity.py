@@ -1,6 +1,7 @@
 # Copyright (c) 2023, Frappe Technologies Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+from dataclasses import fields
 import frappe
 from frappe.model.document import Document
 from frappe.utils import now_datetime
@@ -43,4 +44,5 @@ def get_permission_query_conditions(user: str | None = None, doctype: str | None
 		return None
 
 	readable_assets = frappe.qb.get_query("Asset", fields=["name"], ignore_permissions=False, user=user)
-	return frappe.qb.DocType("Asset Activity").asset.isin(readable_assets)
+	all_assets = frappe.db.get_query("Assets", fields=["name"], ignore_permissions=False)
+	return frappe.qb.DocType("Asset Activity").asset.isin(readable_assets) or frappe.qb.DocType("Asset Activity").asset.notin(all_assets)
